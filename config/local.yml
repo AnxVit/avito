@@ -1,0 +1,11 @@
+env: "local"
+db:
+  user: "postgres"
+  password: 1234
+  host: "localhost"
+  port: 5432
+  dbname: "banner"
+http_server:
+  host: "localhost"
+  port: "8082"
+  timeout: 4s
