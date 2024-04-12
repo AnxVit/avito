@@ -22,6 +22,10 @@ var (
 	dir   = flags.String("dir", "migrations", "directory with mifgration files")
 )
 
+func GetDNS(c *config.DB) string {
+	return fmt.Sprintf(fmtDBString, c.Host, c.User, c.Password, c.DBName, c.Port)
+}
+
 func main() {
 	flags.Parse(os.Args[1:])
 
@@ -32,7 +36,7 @@ func main() {
 	cfg := config.MustLoad()
 	c := cfg.DB
 
-	dbString := fmt.Sprintf(fmtDBString, c.Host, c.User, c.Password, c.DBName, c.Port)
+	dbString := GetDNS(&c)
 
 	db, err := goose.OpenDBWithDriver(dialect, dbString)
 	if err != nil {

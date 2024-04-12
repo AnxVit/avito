@@ -18,7 +18,7 @@ type Db struct {
 	DB *pgx.Conn
 }
 
-func New(storage config.DB) (*Db, error) {
+func New(storage *config.DB) (*Db, error) {
 	const op = "storage.postgres.New"
 	psqlInfo := fmt.Sprintf("user=%s password=%s host=%s "+
 		"port=%d dbname=%s sslmode=disable",
@@ -130,6 +130,7 @@ func (s *Db) PostBanner(banner *models.BannerPost) (int64, error) {
 	execQuery := `INSERT INTO banner(feature, content, access)
 			VALUES ($1, $2, $3)
 			RETURNING id;`
+
 	row := tx.QueryRow(context.Background(), execQuery, banner.Feature, banner.Content, banner.Access)
 
 	var id int64

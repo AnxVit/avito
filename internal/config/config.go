@@ -9,24 +9,24 @@ import (
 )
 
 type Config struct {
-	Env    string `yaml:"env" env-default:"local" env-required:"true"`
+	Env    string `yaml:"env" env-default:"local"`
 	DB     `yaml:"db"`
 	Server `yaml:"http_server"`
 }
 
 type Server struct {
-	Host string `yaml:"host" env-defult:"0.0.0.0"`
-	Port string `yaml:"port" env-default:"8080"`
+	Host string `yaml:"server-host" env-defult:"0.0.0.0"`
+	Port string `yaml:"server-port" env-default:"8082"`
 
 	Timeout time.Duration `yaml:"timeout" env-default:"4s"`
 }
 
 type DB struct {
 	User     string `yaml:"user" env:"PG_USER" env-default:"postgres"`
-	Password string `yaml:"password" env:"PASSWORD" env-required:"true"`
-	Host     string `yaml:"host" env:"HOST" env-default:"localhost"`
-	Port     int    `yaml:"port" env:"PORT" env-default:"5432"`
-	DBName   string `yaml:"dbname" env:"DBNAME" env-required:"true"`
+	Password string `yaml:"password" env:"PG_PASSWORD" env-required:"true"`
+	Host     string `yaml:"host" env:"PG_HOST" env-default:"localhost"`
+	Port     int    `yaml:"port" env:"PG_PORT" env-default:"5432"`
+	DBName   string `yaml:"dbname" env:"PG_DBNAME" env-required:"true"`
 }
 
 func MustLoad() *Config {
@@ -34,7 +34,9 @@ func MustLoad() *Config {
 	if configPath == "" {
 		log.Println("local.yml not set")
 		var cfg Config
-		cleanenv.ReadEnv(&cfg)
+		if err := cleanenv.ReadEnv(&cfg); err != nil {
+			log.Fatalf("cannot read env: %s", err)
+		}
 		return &cfg
 	}
 

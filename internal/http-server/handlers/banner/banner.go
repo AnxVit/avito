@@ -15,23 +15,14 @@ import (
 	"github.com/go-chi/render"
 )
 
-type BannerGetter interface {
+type BannerWorker interface {
 	GetBanner(tag, feature, limit, offset string) ([]models.BannerDB, error)
-}
-
-type BannerSetter interface {
 	PostBanner(banner *models.BannerPost) (int64, error)
-}
-
-type BannerChanger interface {
 	PatchBanner(id string, banner *models.BannerPatch) error
-}
-
-type BannerDeleter interface {
 	DeleteBanner(id string) error
 }
 
-func NewGet(banner_log *slog.Logger, getter BannerGetter) http.HandlerFunc {
+func NewGet(banner_log *slog.Logger, getter BannerWorker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		permission := r.Context().Value(auth.UserContextKey).(access.Access)
 		if permission == access.User {
@@ -68,7 +59,7 @@ func NewGet(banner_log *slog.Logger, getter BannerGetter) http.HandlerFunc {
 	}
 }
 
-func NewPost(banner_log *slog.Logger, setter BannerSetter) http.HandlerFunc {
+func NewPost(banner_log *slog.Logger, setter BannerWorker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		permission := r.Context().Value(auth.UserContextKey).(access.Access)
 		if permission == access.User {
@@ -102,7 +93,7 @@ func NewPost(banner_log *slog.Logger, setter BannerSetter) http.HandlerFunc {
 	}
 }
 
-func NewPatch(banner_log *slog.Logger, changer BannerChanger) http.HandlerFunc {
+func NewPatch(banner_log *slog.Logger, changer BannerWorker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		permission := r.Context().Value(auth.UserContextKey).(access.Access)
 		if permission == access.User {
@@ -144,7 +135,7 @@ func NewPatch(banner_log *slog.Logger, changer BannerChanger) http.HandlerFunc {
 	}
 }
 
-func NewDelete(banner_log *slog.Logger, deleter BannerDeleter) http.HandlerFunc {
+func NewDelete(banner_log *slog.Logger, deleter BannerWorker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		permission := r.Context().Value(auth.UserContextKey).(access.Access)
 		if permission == access.User {

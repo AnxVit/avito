@@ -1,0 +1,59 @@
+feature:
+  - id: 1
+
+  - id: 2
+
+tag:
+  - id: 1
+
+  - id: 2
+
+  - id: 3
+
+  - id: 4
+
+  - id: 5
+
+banner:
+  - feature: 1
+    content: {
+      "color": "blue",
+      "object": "sky"
+    }
+    access: true
+
+  - feature: 2
+    content: {
+      "color": "green",
+      "object": "grenn"
+    }
+    access: true
+
+  - feature: 2
+    content: {
+      "color": "yellow",
+      "object": "sun"
+    }
+    access: true
+
+bannertag:
+  - bannerid: 1
+    tagid: 1
+
+  - bannerid: 1
+    tagid: 2
+
+  - bannerid: 1
+    tagid: 3
+
+  - bannerid: 2
+    tagid: 4
+
+  - bannerid: 2
+    tagid: 5
+
+  - bannerid: 3
+    tagid: 1
+
+  - bannerid: 3
+    tagid: 2
