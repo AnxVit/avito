@@ -1,8 +1,9 @@
 package models
 
 import (
-	"Auth-Reg/internal/domain/models/optional"
 	"time"
+
+	"github.com/AnxVit/avito/internal/domain/models/optional"
 )
 
 type BannerDB struct {

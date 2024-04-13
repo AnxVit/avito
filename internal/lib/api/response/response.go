@@ -3,7 +3,7 @@ package response
 type Response struct {
 	Status string `json:"status"`
 	Error  string `json:"error,omitempty"`
-	Id     int64  `json:"id,omitempty"`
+	ID     int64  `json:"id,omitempty"`
 }
 
 const (
@@ -24,9 +24,9 @@ func Error(msg string) Response {
 	}
 }
 
-func Id(id int64) Response {
+func ID(id int64) Response {
 	return Response{
 		Status: StatusOK,
-		Id:     id,
+		ID:     id,
 	}
 }

@@ -11,12 +11,12 @@ import (
 type Config struct {
 	Env    string `yaml:"env" env-default:"local"`
 	DB     `yaml:"db"`
-	Server `yaml:"http_server"`
+	Server `yaml:"httpServer"`
 }
 
 type Server struct {
-	Host string `yaml:"server-host" env-defult:"0.0.0.0"`
-	Port string `yaml:"server-port" env-default:"8082"`
+	Host string `yaml:"host" env-defult:"0.0.0.0"`
+	Port string `yaml:"port" env-default:"8082"`
 
 	Timeout time.Duration `yaml:"timeout" env-default:"4s"`
 }

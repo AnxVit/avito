@@ -5,7 +5,7 @@ db:
   host: "localhost"
   port: 5432
   dbname: "banner"
-http_server:
+httpServer:
   host: "localhost"
   port: "8082"
   timeout: 4s

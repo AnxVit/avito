@@ -1,33 +1,34 @@
 package cache
 
 import (
-	"Auth-Reg/internal/storage/cache/debounce"
-	"Auth-Reg/internal/storage/postgres"
 	"sync"
 	"time"
+
+	"github.com/AnxVit/avito/internal/storage/cache/debounce"
+	"github.com/AnxVit/avito/internal/storage/postgres"
 )
 
 type Cache struct {
-	DB       *postgres.Db
+	DB       *postgres.Repo
 	cache    sync.Map
-	debounce map[[2]int]interface{}
+	debounce map[[2]int]func(f func())
 }
 
-func New(db *postgres.Db) (*Cache, error) {
+func New(db *postgres.Repo) (*Cache, error) {
 	return &Cache{
 		DB:       db,
-		debounce: make(map[[2]int]interface{}),
+		debounce: make(map[[2]int]func(f func())),
 	}, nil
 }
 
-func (c *Cache) GetUserBanner(tag, feature int, use_last_reversion bool, admin bool) (map[string]interface{}, error) {
+func (c *Cache) GetUserBanner(tag, feature int, useLastReversion bool, admin bool) (map[string]interface{}, error) {
 	key := [2]int{tag, feature}
 
-	if use_last_reversion {
+	if useLastReversion {
 		return c.DB.GetUserBanner(tag, feature, admin)
 	}
 
-	banner_int, ok := c.cache.Load(key)
+	bannerInterface, ok := c.cache.Load(key)
 
 	if !ok {
 		banner, err := c.DB.GetUserBanner(tag, feature, admin)
@@ -38,14 +39,13 @@ func (c *Cache) GetUserBanner(tag, feature int, use_last_reversion bool, admin b
 		if _, ok := c.debounce[key]; !ok {
 			c.debounce[key] = debounce.New(5 * time.Minute)
 		}
-
-		c.debounce[key].(func(f func()))(func() {
+		c.debounce[key](func() {
 			c.cache.Delete(key)
 		})
 		return banner, nil
 	}
-	c.debounce[key].(func(f func()))(func() {
+	c.debounce[key](func() {
 		c.cache.Delete(key)
 	})
-	return banner_int.(map[string]interface{}), nil
+	return bannerInterface.(map[string]interface{}), nil //nolint:forcetypeassert
 }

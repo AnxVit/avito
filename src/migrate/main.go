@@ -1,12 +1,13 @@
 package main
 
 import (
-	"Auth-Reg/internal/config"
 	"context"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/AnxVit/avito/internal/config"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
@@ -50,6 +51,6 @@ func main() {
 	}()
 
 	if err := goose.RunContext(context.Background(), command, db, *dir, args[1:]...); err != nil {
-		log.Fatalf("migrate %v: %v", command, err)
+		log.Printf("migrate %v: %v", command, err)
 	}
 }

@@ -1,13 +1,14 @@
 package server
 
 import (
-	"Auth-Reg/internal/config"
-	"Auth-Reg/internal/http-server/handlers/banner"
-	userbanner "Auth-Reg/internal/http-server/handlers/user_banner"
-	"Auth-Reg/internal/http-server/middleware/auth"
-	"Auth-Reg/internal/storage/cache"
 	"log/slog"
 	"net/http"
+
+	"github.com/AnxVit/avito/internal/config"
+	"github.com/AnxVit/avito/internal/http-server/handlers/banner"
+	userbanner "github.com/AnxVit/avito/internal/http-server/handlers/user_banner"
+	"github.com/AnxVit/avito/internal/http-server/middleware/auth"
+	"github.com/AnxVit/avito/internal/storage/cache"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

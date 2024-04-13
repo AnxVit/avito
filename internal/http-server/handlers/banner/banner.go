@@ -1,37 +1,38 @@
 package banner
 
 import (
-	"Auth-Reg/internal/domain/models"
-	"Auth-Reg/internal/http-server/middleware/auth"
-	"Auth-Reg/internal/http-server/middleware/auth/access"
-	resp "Auth-Reg/internal/lib/api/response"
-	"Auth-Reg/internal/storage"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
 
+	"github.com/AnxVit/avito/internal/domain/models"
+	"github.com/AnxVit/avito/internal/http-server/middleware/auth"
+	"github.com/AnxVit/avito/internal/http-server/middleware/auth/access"
+	resp "github.com/AnxVit/avito/internal/lib/api/response"
+	"github.com/AnxVit/avito/internal/storage"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
 
-type BannerWorker interface {
+type Worker interface {
 	GetBanner(tag, feature, limit, offset string) ([]models.BannerDB, error)
 	PostBanner(banner *models.BannerPost) (int64, error)
 	PatchBanner(id string, banner *models.BannerPatch) error
 	DeleteBanner(id string) error
 }
 
-func NewGet(banner_log *slog.Logger, getter BannerWorker) http.HandlerFunc {
+func NewGet(bannerLog *slog.Logger, getter Worker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		permission := r.Context().Value(auth.UserContextKey).(access.Access)
+		permission := r.Context().Value(auth.UserContextKey).(access.Access) //nolint:forcetypeassert
 		if permission == access.User {
-			banner_log.Info("don't have permission")
+			bannerLog.Info("don't have permission")
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 		if permission == access.NotAccess {
-			banner_log.Info("unauthorized")
+			bannerLog.Info("unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -44,11 +45,11 @@ func NewGet(banner_log *slog.Logger, getter BannerWorker) http.HandlerFunc {
 		banner, err := getter.GetBanner(tag, feature, limit, offset)
 		if err != nil {
 			if errors.Is(err, storage.ErrNotAccess) {
-				banner_log.Info("not access")
+				bannerLog.Info("not access")
 				w.WriteHeader(http.StatusForbidden)
 				return
 			}
-			banner_log.Error("falied to get banner", slog.Attr{
+			bannerLog.Error("falied to get banner", slog.Attr{
 				Key:   "error",
 				Value: slog.StringValue(err.Error()),
 			})
@@ -59,16 +60,16 @@ func NewGet(banner_log *slog.Logger, getter BannerWorker) http.HandlerFunc {
 	}
 }
 
-func NewPost(banner_log *slog.Logger, setter BannerWorker) http.HandlerFunc {
+func NewPost(bannerLog *slog.Logger, setter Worker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		permission := r.Context().Value(auth.UserContextKey).(access.Access)
+		permission := r.Context().Value(auth.UserContextKey).(access.Access) //nolint:forcetypeassert
 		if permission == access.User {
-			banner_log.Info("don't have permission")
+			bannerLog.Info("don't have permission")
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 		if permission == access.NotAccess {
-			banner_log.Info("unauthorized")
+			bannerLog.Info("unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -81,7 +82,7 @@ func NewPost(banner_log *slog.Logger, setter BannerWorker) http.HandlerFunc {
 		}
 		id, err := setter.PostBanner(&banner)
 		if err != nil {
-			banner_log.Error("failed to post banner", slog.Attr{
+			bannerLog.Error("failed to post banner", slog.Attr{
 				Key:   "error",
 				Value: slog.StringValue(err.Error()),
 			})
@@ -89,30 +90,30 @@ func NewPost(banner_log *slog.Logger, setter BannerWorker) http.HandlerFunc {
 			return
 		}
 		w.WriteHeader(http.StatusCreated)
-		render.JSON(w, r, resp.Id(id))
+		render.JSON(w, r, resp.ID(id))
 	}
 }
 
-func NewPatch(banner_log *slog.Logger, changer BannerWorker) http.HandlerFunc {
+func NewPatch(bannerLog *slog.Logger, changer Worker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		permission := r.Context().Value(auth.UserContextKey).(access.Access)
+		permission := r.Context().Value(auth.UserContextKey).(access.Access) //nolint:forcetypeassert
 		if permission == access.User {
-			banner_log.Info("don't have permission")
+			bannerLog.Info("don't have permission")
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 		if permission == access.NotAccess {
-			banner_log.Info("unauthorized")
+			bannerLog.Info("unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
 		id := chi.URLParam(r, "id")
 		banner := models.BannerPatch{}
-		err := json.NewDecoder(r.Body).Decode(&banner)
 
+		err := json.NewDecoder(r.Body).Decode(&banner)
 		if err != nil {
-			banner_log.Info("bad request", err)
+			bannerLog.Info("bad request", err)
 			w.WriteHeader(http.StatusBadRequest)
 			render.JSON(w, r, resp.Error(err.Error()))
 			return
@@ -120,11 +121,11 @@ func NewPatch(banner_log *slog.Logger, changer BannerWorker) http.HandlerFunc {
 		err = changer.PatchBanner(id, &banner)
 		if err != nil {
 			if errors.Is(err, storage.ErrBannerNotFound) {
-				banner_log.Info("banner not found")
+				bannerLog.Info("banner not found")
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
-			banner_log.Error("falied to patch banner", slog.Attr{
+			bannerLog.Error("falied to patch banner", slog.Attr{
 				Key:   "error",
 				Value: slog.StringValue(err.Error()),
 			})
@@ -135,16 +136,16 @@ func NewPatch(banner_log *slog.Logger, changer BannerWorker) http.HandlerFunc {
 	}
 }
 
-func NewDelete(banner_log *slog.Logger, deleter BannerWorker) http.HandlerFunc {
+func NewDelete(bannerLog *slog.Logger, deleter Worker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		permission := r.Context().Value(auth.UserContextKey).(access.Access)
+		permission := r.Context().Value(auth.UserContextKey).(access.Access) //nolint:forcetypeassert
 		if permission == access.User {
-			banner_log.Info("don't have permission")
+			bannerLog.Info("don't have permission")
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 		if permission == access.NotAccess {
-			banner_log.Info("unauthorized")
+			bannerLog.Info("unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -154,11 +155,11 @@ func NewDelete(banner_log *slog.Logger, deleter BannerWorker) http.HandlerFunc {
 		err := deleter.DeleteBanner(id)
 		if err != nil {
 			if errors.Is(err, storage.ErrBannerNotFound) {
-				banner_log.Info("banner not found")
+				bannerLog.Info("banner not found")
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
-			banner_log.Error("falied to delete banner", slog.Attr{
+			bannerLog.Error("falied to delete banner", slog.Attr{
 				Key:   "error",
 				Value: slog.StringValue(err.Error()),
 			})

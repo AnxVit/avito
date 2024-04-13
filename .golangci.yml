@@ -1,0 +1,148 @@
+
+run:
+
+  concurrency: 4
+
+  timeout: 5m
+
+  issues-exit-code: 1
+
+  tests: false
+
+  modules-download-mode: readonly
+
+  allow-parallel-runners: false
+
+  go: ""
+
+output:
+  formats:
+    - format: colored-line-number
+  print-issued-lines: false
+
+  print-linter-name: true
+
+  uniq-by-line: false
+
+  path-prefix: ""
+
+  sort-results: true
+
+linters:
+  fast: false
+
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - contextcheck
+    - durationcheck
+    - decorder
+    - errcheck
+    - errname
+    - errorlint
+    - exportloopref
+    - gocritic
+    - godot
+    - gofmt
+    - gofumpt
+    - goimports
+    - gomoddirectives
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - nilerr
+    - nilnil
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - reassign
+    - revive
+    - rowserrcheck
+    - staticcheck
+    - stylecheck
+    - tenv
+    - testableexamples
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - wastedassign
+    - unused
+    - forcetypeassert
+    - maintidx
+    - gocheckcompilerdirectives
+    - whitespace
+
+  disable:
+    - promlinter
+    - containedctx
+    - cyclop
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+    - dupword
+    - errchkjson
+    - execinquery
+    - exhaustive
+    - exhaustruct
+    - forbidigo
+    - funlen
+    - gci
+    - ginkgolinter
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocyclo
+    - godox
+    - goerr113
+    - golint
+    - gomnd
+    - gomodguard
+    - goprintffuncname
+    - grouper
+    - ifshort
+    - importas
+    - interfacebloat
+    - ireturn
+    - lll
+    - loggercheck
+    - makezero
+    - maligned
+    - musttag
+    - nestif
+    - nlreturn
+    - nonamedreturns
+    - nosnakecase
+    - paralleltest
+    - testpackage
+    - typecheck
+    - varnamelen
+    - wsl
+
+linters-settings:
+  errcheck:
+    exclude-functions:
+      - (github.com/jackc/pgx/v5.Tx).Rollback(context.Context)
+      - (*flag.FlagSet).Parse([]string)
+  
+
+
+issues:
+
+  exclude-dirs-use-default: false
+
+  max-issues-per-linter: 0
+
+  max-same-issues: 0
+
+  new: false
+
+  fix: false

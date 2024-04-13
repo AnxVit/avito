@@ -1,11 +1,6 @@
 package test
 
 import (
-	"Auth-Reg/internal/config"
-	"Auth-Reg/internal/http-server/server"
-	"Auth-Reg/internal/storage/cache"
-	"Auth-Reg/internal/storage/postgres"
-	pgcontainer "Auth-Reg/test/container/postgres"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -18,7 +13,13 @@ import (
 	"testing"
 	"time"
 
-	"Auth-Reg/test/migrate"
+	"github.com/AnxVit/avito/internal/config"
+	"github.com/AnxVit/avito/internal/http-server/server"
+	"github.com/AnxVit/avito/internal/storage/cache"
+	"github.com/AnxVit/avito/internal/storage/postgres"
+	pgcontainer "github.com/AnxVit/avito/test/container/postgres"
+
+	"github.com/AnxVit/avito/test/migrate"
 
 	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/stretchr/testify/suite"

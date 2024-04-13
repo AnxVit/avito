@@ -1,14 +1,15 @@
 package userbanner
 
 import (
-	"Auth-Reg/internal/http-server/middleware/auth"
-	"Auth-Reg/internal/http-server/middleware/auth/access"
-	resp "Auth-Reg/internal/lib/api/response"
-	"Auth-Reg/internal/storage"
 	"errors"
 	"log/slog"
 	"net/http"
 	"strconv"
+
+	"github.com/AnxVit/avito/internal/http-server/middleware/auth"
+	"github.com/AnxVit/avito/internal/http-server/middleware/auth/access"
+	resp "github.com/AnxVit/avito/internal/lib/api/response"
+	"github.com/AnxVit/avito/internal/storage"
 
 	"github.com/go-chi/render"
 )
@@ -18,16 +19,15 @@ type Response struct {
 }
 
 type Banner interface {
-	GetUserBanner(tag, feature int, use_last_version bool, admin bool) (map[string]interface{}, error)
+	GetUserBanner(tag, feature int, useLastVersion bool, admin bool) (map[string]interface{}, error)
 }
 
-func New(banner_log *slog.Logger, banner Banner) http.HandlerFunc {
+func New(bannerLog *slog.Logger, banner Banner) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		permission := r.Context().Value(auth.UserContextKey).(access.Access)
+		permission := r.Context().Value(auth.UserContextKey).(access.Access) //nolint:forcetypeassert
 
 		if permission == access.NotAccess {
-			banner_log.Info("unauthorized")
+			bannerLog.Info("unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -36,38 +36,38 @@ func New(banner_log *slog.Logger, banner Banner) http.HandlerFunc {
 		feature := r.URL.Query().Get("feature_id")
 
 		if tag == "" || feature == "" {
-			banner_log.Info("required tag/feature")
+			bannerLog.Info("required tag/feature")
 			w.WriteHeader(http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("not set tag and/or feature"))
 			return
 		}
 
-		tag_id, err := strconv.Atoi(tag)
+		tagID, err := strconv.Atoi(tag)
 		if err != nil {
-			banner_log.Info("tag is not int")
+			bannerLog.Info("tag is not int")
 			w.WriteHeader(http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("tag is not integer"))
 			return
 		}
 
-		feature_id, err := strconv.Atoi(feature)
+		featureID, err := strconv.Atoi(feature)
 		if err != nil {
-			banner_log.Info("feature is not int")
+			bannerLog.Info("feature is not int")
 			w.WriteHeader(http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("feature is not integer"))
 			return
 		}
 
-		var use_last_vers bool
+		var lastVers bool
 		last := r.URL.Query().Get("use_last_revision")
 		if last == "" {
-			use_last_vers = false
+			lastVers = false
 		} else {
-			use_last_vers, err = strconv.ParseBool(last)
+			lastVers, err = strconv.ParseBool(last)
 			if err != nil {
-				banner_log.Info("use_last_version is incorrect")
+				bannerLog.Info("use_last_version is incorrect")
 				w.WriteHeader(http.StatusBadRequest)
-				render.JSON(w, r, resp.Error("use_last verison is incorrect"))
+				render.JSON(w, r, resp.Error("use_last_version is incorrect"))
 				return
 			}
 		}
@@ -77,19 +77,19 @@ func New(banner_log *slog.Logger, banner Banner) http.HandlerFunc {
 			admin = true
 		}
 
-		banner, err := banner.GetUserBanner(tag_id, feature_id, use_last_vers, admin)
+		banner, err := banner.GetUserBanner(tagID, featureID, lastVers, admin)
 		if err != nil {
 			if errors.Is(err, storage.ErrBannerNotFound) {
-				banner_log.Info("banner not found")
+				bannerLog.Info("banner not found")
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
 			if errors.Is(err, storage.ErrNotAccess) {
-				banner_log.Info("not access")
+				bannerLog.Info("not access")
 				w.WriteHeader(http.StatusForbidden)
 				return
 			}
-			banner_log.Error("falied to get banner", slog.Attr{
+			bannerLog.Error("falied to get banner", slog.Attr{
 				Key:   "error",
 				Value: slog.StringValue(err.Error()),
 			})

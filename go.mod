@@ -1,4 +1,4 @@
-module Auth-Reg
+module github.com/AnxVit/avito
 
 go 1.21.5
 

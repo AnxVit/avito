@@ -1,12 +1,13 @@
 package main
 
 import (
-	"Auth-Reg/internal/config"
-	"Auth-Reg/internal/http-server/server"
-	"Auth-Reg/internal/storage/cache"
-	"Auth-Reg/internal/storage/postgres"
 	"log/slog"
 	"os"
+
+	"github.com/AnxVit/avito/internal/config"
+	"github.com/AnxVit/avito/internal/http-server/server"
+	"github.com/AnxVit/avito/internal/storage/cache"
+	"github.com/AnxVit/avito/internal/storage/postgres"
 )
 
 const (

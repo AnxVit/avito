@@ -1,9 +1,6 @@
 package postgres
 
 import (
-	"Auth-Reg/internal/config"
-	"Auth-Reg/internal/domain/models"
-	"Auth-Reg/internal/storage"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -11,14 +8,18 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/AnxVit/avito/internal/config"
+	"github.com/AnxVit/avito/internal/domain/models"
+	"github.com/AnxVit/avito/internal/storage"
+
 	"github.com/jackc/pgx/v5"
 )
 
-type Db struct {
+type Repo struct {
 	DB *pgx.Conn
 }
 
-func New(storage *config.DB) (*Db, error) {
+func New(storage *config.DB) (*Repo, error) {
 	const op = "storage.postgres.New"
 	psqlInfo := fmt.Sprintf("user=%s password=%s host=%s "+
 		"port=%d dbname=%s sslmode=disable",
@@ -28,12 +29,12 @@ func New(storage *config.DB) (*Db, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return &Db{
+	return &Repo{
 		DB: db,
 	}, nil
 }
 
-func (s *Db) GetUserBanner(tag, feature int, admin bool) (map[string]interface{}, error) {
+func (s *Repo) GetUserBanner(tag, feature int, admin bool) (map[string]interface{}, error) {
 	const op = "storage.postgres.GetUserBanner"
 
 	var banner map[string]interface{}
@@ -50,7 +51,6 @@ func (s *Db) GetUserBanner(tag, feature int, admin bool) (map[string]interface{}
 				bannertag
 			WHERE TagID = $2
 			);`, feature, tag).Scan(&banner, &access)
-
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrBannerNotFound
@@ -64,7 +64,7 @@ func (s *Db) GetUserBanner(tag, feature int, admin bool) (map[string]interface{}
 	return banner, nil
 }
 
-func (s *Db) GetBanner(tag, feature, limit, offset string) ([]models.BannerDB, error) {
+func (s *Repo) GetBanner(tag, feature, limit, offset string) ([]models.BannerDB, error) {
 	const op = "storage.postgres.GetBanner"
 
 	var buffer bytes.Buffer
@@ -118,7 +118,7 @@ func (s *Db) GetBanner(tag, feature, limit, offset string) ([]models.BannerDB, e
 	return banners, nil
 }
 
-func (s *Db) PostBanner(banner *models.BannerPost) (int64, error) {
+func (s *Repo) PostBanner(banner *models.BannerPost) (int64, error) {
 	const op = "storage.postgres.PostBanner"
 
 	tx, err := s.DB.Begin(context.Background())
@@ -152,7 +152,7 @@ func (s *Db) PostBanner(banner *models.BannerPost) (int64, error) {
 	return id, nil
 }
 
-func (s *Db) PatchBanner(id string, banner *models.BannerPatch) error {
+func (s *Repo) PatchBanner(id string, banner *models.BannerPatch) error {
 	const op = "storage.postgres.PatchBanner"
 	tx, err := s.DB.Begin(context.Background())
 	if err != nil {
@@ -246,7 +246,7 @@ func (s *Db) PatchBanner(id string, banner *models.BannerPatch) error {
 	return nil
 }
 
-func (s *Db) DeleteBanner(id string) error {
+func (s *Repo) DeleteBanner(id string) error {
 	const op = "storage.postgres.DeleteBanner"
 	res, err := s.DB.Exec(context.Background(), "DELETE FROM banner WHERE id = "+id)
 	if err != nil {
@@ -260,5 +260,4 @@ func (s *Db) DeleteBanner(id string) error {
 	}
 
 	return err
-
 }
