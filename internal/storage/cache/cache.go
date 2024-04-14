@@ -5,16 +5,19 @@ import (
 	"time"
 
 	"github.com/AnxVit/avito/internal/storage/cache/debounce"
-	"github.com/AnxVit/avito/internal/storage/postgres"
 )
 
+type Repository interface {
+	GetUserBanner(tag, feature int, admin bool) (map[string]interface{}, error)
+}
+
 type Cache struct {
-	DB       *postgres.Repo
+	DB       Repository
 	cache    sync.Map
 	debounce map[[2]int]func(f func())
 }
 
-func New(db *postgres.Repo) (*Cache, error) {
+func New(db Repository) (*Cache, error) {
 	return &Cache{
 		DB:       db,
 		debounce: make(map[[2]int]func(f func())),
@@ -29,7 +32,6 @@ func (c *Cache) GetUserBanner(tag, feature int, useLastReversion bool, admin boo
 	}
 
 	bannerInterface, ok := c.cache.Load(key)
-
 	if !ok {
 		banner, err := c.DB.GetUserBanner(tag, feature, admin)
 		if err != nil {
@@ -44,8 +46,6 @@ func (c *Cache) GetUserBanner(tag, feature int, useLastReversion bool, admin boo
 		})
 		return banner, nil
 	}
-	c.debounce[key](func() {
-		c.cache.Delete(key)
-	})
+
 	return bannerInterface.(map[string]interface{}), nil //nolint:forcetypeassert
 }

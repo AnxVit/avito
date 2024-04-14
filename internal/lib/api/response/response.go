@@ -3,7 +3,7 @@ package response
 type Response struct {
 	Status string `json:"status"`
 	Error  string `json:"error,omitempty"`
-	ID     int64  `json:"id,omitempty"`
+	ID     int64  `json:"banner_id,omitempty"`
 }
 
 const (

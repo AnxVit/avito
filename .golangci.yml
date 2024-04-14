@@ -132,6 +132,9 @@ linters-settings:
     exclude-functions:
       - (github.com/jackc/pgx/v5.Tx).Rollback(context.Context)
       - (*flag.FlagSet).Parse([]string)
+  errorlint:
+
+    asserts: false
   
 
 

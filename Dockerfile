@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY ./ ./
 
-RUN go build -o ./bin/api ./src/auth-reg \
+RUN go build -o ./bin/api ./src/avito \
     && go build -o ./bin/migrate ./src/migrate
 
 CMD ["/src/bin/api"]

@@ -13,10 +13,11 @@ import (
 	"github.com/AnxVit/avito/internal/storage"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Repo struct {
-	DB *pgx.Conn
+	DB *pgxpool.Pool
 }
 
 func New(storage *config.DB) (*Repo, error) {
@@ -24,7 +25,7 @@ func New(storage *config.DB) (*Repo, error) {
 	psqlInfo := fmt.Sprintf("user=%s password=%s host=%s "+
 		"port=%d dbname=%s sslmode=disable",
 		storage.User, storage.Password, storage.Host, storage.Port, storage.DBName)
-	db, err := pgx.Connect(context.Background(), psqlInfo)
+	db, err := pgxpool.New(context.Background(), psqlInfo)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -38,7 +39,7 @@ func (s *Repo) GetUserBanner(tag, feature int, admin bool) (map[string]interface
 	const op = "storage.postgres.GetUserBanner"
 
 	var banner map[string]interface{}
-	var access bool
+	var access *bool
 	err := s.DB.QueryRow(context.Background(),
 		`SELECT 
 			content,
@@ -57,8 +58,7 @@ func (s *Repo) GetUserBanner(tag, feature int, admin bool) (map[string]interface
 		}
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
-
-	if !access && !admin {
+	if access == nil || (!*access && !admin) {
 		return nil, storage.ErrNotAccess
 	}
 	return banner, nil
@@ -89,6 +89,7 @@ func (s *Repo) GetBanner(tag, feature, limit, offset string) ([]models.BannerDB,
 	if tag != "" {
 		buffer.WriteString(` HAVING ` + tag + ` = ANY(array_agg(bannertag.TagID))`)
 	}
+	buffer.WriteString(" ORDER BY id")
 	if limit != "" {
 		buffer.WriteString(" LIMIT " + limit)
 	}
@@ -96,7 +97,6 @@ func (s *Repo) GetBanner(tag, feature, limit, offset string) ([]models.BannerDB,
 	if offset != "" {
 		buffer.WriteString(" OFFSET " + offset)
 	}
-
 	buffer.WriteString(";")
 
 	rows, err := s.DB.Query(context.Background(), buffer.String())
@@ -154,6 +154,7 @@ func (s *Repo) PostBanner(banner *models.BannerPost) (int64, error) {
 
 func (s *Repo) PatchBanner(id string, banner *models.BannerPatch) error {
 	const op = "storage.postgres.PatchBanner"
+
 	tx, err := s.DB.Begin(context.Background())
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
@@ -188,6 +189,7 @@ func (s *Repo) PatchBanner(id string, banner *models.BannerPatch) error {
 		}
 		i++
 	}
+
 	if banner.Access.Defined {
 		if i > 0 {
 			buffer.WriteString(", ")

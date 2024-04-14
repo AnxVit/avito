@@ -22,18 +22,18 @@ func main() {
 	log := setupLogger(cfg.Env)
 	log.Info("starting auth-reg server", slog.String("env", cfg.Env))
 
-	db, err := postgres.New(&cfg.DB)
+	repo, err := postgres.New(&cfg.DB)
 	if err != nil {
 		log.Error("failed to init db")
 		os.Exit(1)
 	}
-	storage, err := cache.New(db)
+	localcache, err := cache.New(repo)
 	if err != nil {
 		log.Error("failed to init cache")
 		os.Exit(2)
 	}
 
-	srv := server.New(&cfg.Server, storage, log)
+	srv := server.New(&cfg.Server, repo, localcache, log)
 	if err := srv.Serve(); err != nil {
 		log.Error("failed to start server")
 	}
