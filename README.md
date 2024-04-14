@@ -89,20 +89,20 @@ make help
 
 ## Примеры использования
 ### Создание банера
-![Alt text](https://github.com/AnxVit/avito/tree/main/photo/post.jpg?raw=true)
+![Alt text](https://raw.githubusercontent.com/AnxVit/avito/main/photo/post.jpg?raw=true)
 ### Получение банера от имени пользователя
-![Alt text](https://github.com/AnxVit/avito/tree/main/photo/user_get.jpg?raw=true)
+![Alt text](https://raw.githubusercontent.com/AnxVit/avito/main/photo/user_get.jpg?raw=true)
 ### Изменяем данные
-![Alt text](https://github.com/AnxVit/avito/tree/main/photo/patch.jpg?raw=true)
+![Alt text](https://raw.githubusercontent.com/AnxVit/avito/main/photo/patch.jpg?raw=true)
 ### Получаем данные от имени пользователя
-![Alt text](https://github.com/AnxVit/avito/tree/main/photo/user_get2.jpg?raw=true)
+![Alt text](https://raw.githubusercontent.com/AnxVit/avito/main/photo/user_get2.jpg?raw=true)
 ### Получаем данные от имени пользователя с флагом use_last_revesion
-![Alt text](https://github.com/AnxVit/avito/tree/main/photo/user_get_last.jpg?raw=true)
+![Alt text](https://raw.githubusercontent.com/AnxVit/avito/main/photo/user_get_last.jpg?raw=true)
 
 ### Удаляем баннер
-![Alt text](https://github.com/AnxVit/avito/tree/main/photo/delete.jpg?raw=true)
+![Alt text](https://raw.githubusercontent.com/AnxVit/avito/main/photo/delete.jpg?raw=true)
 ### Пытаемся получить баннер после удаления
-![Alt text](https://github.com/AnxVit/avito/tree/main/photo/get_delete.jpg?raw=true)
+![Alt text](https://raw.githubusercontent.com/AnxVit/avito/main/photo/get_delete.jpg?raw=true)
 
 ## Дополнительная реализация
 - Была настроена конфигурация линтера `golangci-lint` в файле `.golangci.yml`
@@ -152,5 +152,5 @@ make help
 
 Где bannertag была связью между banner и tag (связь многие-ко-многим). Banner и feature - связь один ко многим.  
 
-[def1]: https://github.com/AnxVit/avito/tree/main/photo/bench_admin.jpg?raw=true
-[def2]: https://github.com/AnxVit/avito/tree/main/photo/bench_user.jpg?raw=true
+[def1]: https://raw.githubusercontent.com/AnxVit/avito/main/photo/bench_admin.jpg?raw=true
+[def2]: https://raw.githubusercontent.com/AnxVit/avito/main/photo/bench_user.jpg?raw=true
